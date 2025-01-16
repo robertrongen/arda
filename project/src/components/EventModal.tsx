@@ -89,7 +89,15 @@ export const EventModal: React.FC<EventModalProps> = ({
 
           <div>
             <h3 className="text-lg font-semibold">Source</h3>
-            <p className="text-gray-600 text-sm">{event.source}</p>
+            {Array.isArray(event.source) ? (
+              <ul className="text-gray-600 text-sm list-disc list-inside">
+                {event.source.map((src, idx) => (
+                  <li key={idx}>{src}</li>
+                ))}
+              </ul>
+            ) : (
+              <p className="text-gray-600 text-sm">{event.source}</p>
+            )}
           </div>
         </div>
       </div>

@@ -1,7 +1,36 @@
 {
-  "files": [],
-  "references": [
-    { "path": "./tsconfig.app.json" },
-    { "path": "./tsconfig.node.json" }
-  ]
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "node", 
+
+    /* React/JSX handling */
+    // For React 17+ with the new JSX transform:
+    "jsx": "react-jsx",
+    // Or if you prefer the older JSX transform:
+    // "jsx": "react",
+
+    /* Strictness & Interop */
+    "lib": ["DOM", "DOM.Iterable", "ESNext"],
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "allowSyntheticDefaultImports": true,
+
+    /* Output handling */
+    // This will compile *.ts/*.tsx into /dist (optional).
+    "outDir": "dist"
+    // If you do want separate configs or different outDirs, 
+    // you can do so, but let's keep it simple for now.
+  },
+  "include": [
+    // We just include everything in src
+    "src"
+  ],
+  // Remove or comment out references if you don't need multi-project setup
+  // "references": [
+  //   { "path": "./tsconfig.app.json" },
+  //   { "path": "./tsconfig.node.json" }
+  // ]
 }

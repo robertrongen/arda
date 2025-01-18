@@ -29,7 +29,7 @@ interface Event {
 }
 
 function runImport() {
-const db1 = new Database('events.db');
+const db = new Database('events.db');
   // Create table if it doesn't exist
   db.exec(`
     CREATE TABLE IF NOT EXISTS events (

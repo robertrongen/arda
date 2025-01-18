@@ -14,10 +14,12 @@ function App() {
     searchTerm: '',
     selectedEras: Object.values(Era),
   });
+  const apiBase = import.meta.env.VITE_API_BASE_URL || '/api';
+  console.log(`API Base URL: ${apiBase}`);
 
   // 1. Fetch events from the server when the component mounts
   useEffect(() => {
-    fetch('/api/events')
+    fetch(`${apiBase}/events`)
       .then((response) => response.json())
       .then((data: Event[]) => {
         // data should be an array of Event objects

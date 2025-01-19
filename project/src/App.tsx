@@ -30,7 +30,7 @@ function App() {
       });
   }, []);
 
-  // 2. Filter the fetched events (instead of mockEvents)
+  // 2. Filter the fetched events based on the search term and selected eras
   const filteredEvents = events.filter((event) => {
     const matchesSearch =
       filters.searchTerm === '' ||

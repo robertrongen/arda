@@ -1,3 +1,4 @@
+// project/src/server/index.ts
 import express from 'express';
 import Database from 'better-sqlite3';
 import { z } from 'zod';

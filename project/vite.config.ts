@@ -1,3 +1,4 @@
+// vite.config.ts is the configuration file for Vite. It is used to configure the Vite development server and build process.
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 

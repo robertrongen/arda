@@ -12,25 +12,29 @@ export const Timeline: React.FC<TimelineProps> = ({ events, onEventClick }) => {
         {events.map((event, index) => (
           <div
             key={event.id}
-            className={`flex items-center mb-8 ${
-              index % 2 === 0 ? 'flex-row-reverse' : ''
-            }`}
+            className={`relative flex items-center mb-8 ${
+              index % 2 === 0 ? 'sm:flex-row-reverse' : ''
+              } flex-col sm:flex-row`}
           >
-            <div className="w-5/12" />
+            <div className="w-8/12" />
+
+            {/* Timeline Line */}
             <div className="relative flex items-center justify-center w-2/12">
               <div className="w-8 h-8 bg-indigo-600 rounded-full flex items-center justify-center">
                 <Clock className="w-4 h-4 text-white" />
               </div>
             </div>
+            
+            {/* Event Box */}
             <div
-              className="w-5/12 bg-white p-4 rounded-lg shadow-md cursor-pointer hover:shadow-lg transition-shadow"
+              className="relative w-8/12 bg-white p-4 rounded-lg shadow-md cursor-pointer hover:shadow-lg transition-shadow"
               onClick={() => onEventClick(event)}
             >
               <h3 className="text-lg font-semibold mb-2">{event.title}</h3>
               <p className="text-sm text-gray-600 mb-1">
                 {event.era} {event.year && `- Year ${event.year}`}
               </p>
-              <p className="text-sm text-gray-700 line-clamp-2">{event.summary}</p>
+              <p className="text-sm text-gray-700 line-clamp-3">{event.summary}</p>
             </div>
           </div>
         ))}

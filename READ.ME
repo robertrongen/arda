@@ -1,53 +1,241 @@
-# Tolkien Timeline Explorer
-
-Welcome to the Tolkien Timeline Explorer project! This application provides an interactive timeline of major events from J.R.R. Tolkien's legendarium, from the creation of Arda through the Fourth Age.
-
-## Table of Contents
-
-1. [Overview](#overview)
-2. [Folder Structure](#folder-structure)
-3. [Installation](#installation)
-4. [Setup & Data Import](#setup--data-import)
-5. [Running the App Locally](#running-the-app-locally)
-6. [Deployment](#deployment)
-7. [Future Enhancements](#future-enhancements)
-8. [License](#license)
-
----
+# Arda Tolkien Timeline Explorer
 
 ## Overview
-
-**Tech Stack**:  
-- **React + TypeScript** for the frontend  
-- **Express.js + better-sqlite3** for a lightweight backend with SQLite  
-- **Tailwind CSS** for styling (or your chosen CSS framework)  
-- **React Query** for data fetching/caching  
-- **React Modal** for the event detail view  
-
-**Core Features**:
-- Timeline visualization (vertical or horizontal)  
-- Search bar with text and era filters  
-- Detailed event modal with cross-linked events  
-- Responsive design for desktop and mobile  
+Arda Tolkien Timeline Explorer is a web application designed to explore the rich history of Tolkien's world. This README provides instructions for setting up, deploying, and debugging the application in both development and production environments.
 
 ---
 
-## Future Enhancements:
+## Table of Contents
+- [Development Setup](#development-setup)
+- [Production Deployment](#production-deployment)
+- [Debugging](#debugging)
+- [API Documentation](#api-documentation)
+- [Environment Variables](#environment-variables)
 
-1. Search and Filter
-- Search by keyword (e.g., “Fëanor” or “Rings of Power”).
-- Filter by era (Years of the Trees, First Age, Second Age, etc.) or by region (Valinor, Beleriand, etc.).
-- Filter by character/faction (Noldor, Dúnedain, etc.).
-2. Drill-Down Detail
-- When a user clicks on an event, they can see a more in-depth description with images (like maps of Beleriand), quotes from Tolkien’s texts, genealogical charts, etc.
-3. Interactive Timeline View
-- A timeline that you can scroll through horizontally. Clicking on an event bubble (or marker) pops up details.
-4. Map Integration using a library like Leaflet
-- A “world map” view (for Middle-earth, Beleriand, Aman) where pinned locations correspond to events. Clicking a pin opens event info.
-5. Cross-Referencing & Linking
-- Show “related events” on the event’s detail page as clickable links, so a user can jump between connected milestones easily.
-6. Genealogical / Character Trees
-- Visual representation of who’s who, letting you click a character to see all events they’re involved in.
-7. Personal Note-Taking
-- Users could bookmark or add notes to an event (useful for readers doing in-depth study).
-8. Implement character/location pages
+---
+
+## Development Setup
+
+### Prerequisites
+Ensure you have the following installed:
+- **Node.js** (v18 or later)
+- **npm** (v10 or later)
+- SQLite3 (for the local database)
+
+### Steps
+
+1. **Clone the Repository**
+   ```bash
+   git clone https://your-repo-url/arda.git
+   cd arda
+   ```
+
+2. **Install Dependencies**
+   ```bash
+   npm install
+   ```
+
+3. **Set Environment Variables**
+   Create a `.env` file in the root directory with the following content:
+   ```env
+   VITE_API_BASE_URL=/api
+   ```
+
+4. **Start the Development Server**
+   Run the development server with Vite:
+   ```bash
+   npm run dev
+   ```
+
+5. **Start the Backend Server**
+   In another terminal, run:
+   ```bash
+   npm run server
+   ```
+   This will start the backend server at `http://localhost:3000`.
+
+6. **Access the Application**
+   Open your browser and navigate to:
+   ```
+   http://localhost:5173
+   ```
+
+---
+
+## Production Deployment
+
+### Prerequisites
+- **Ubuntu Server** (or similar Linux-based environment)
+- **Node.js** installed globally
+- **Apache2** (for serving static files and reverse proxy)
+- **Systemd** (for managing backend service)
+
+### Steps
+
+1. **Clone the Repository**
+   ```bash
+   git clone https://your-repo-url/arda.git /var/www/hobunror/arda
+   cd /var/www/hobunror/arda
+   ```
+
+2. **Install Dependencies**
+   ```bash
+   npm install
+   ```
+
+3. **Set Up Environment Variables**
+   Create a `.env.production` file:
+   ```env
+   VITE_API_BASE_URL=/arda/api
+   ```
+
+4. **Build the Frontend**
+   ```bash
+   npm run build
+   ```
+   The build files will be generated in the `dist/` directory.
+
+5. **Set Up Apache Configuration**
+   Create or update the Apache site configuration file `/etc/apache2/sites-available/arda.conf`:
+   ```apache
+   <VirtualHost *:443>
+       ServerName hobunror.nl
+       DocumentRoot /var/www/hobunror/arda/dist
+
+       SSLEngine on
+       SSLCertificateFile /etc/letsencrypt/live/hobunror.nl/fullchain.pem
+       SSLCertificateKeyFile /etc/letsencrypt/live/hobunror.nl/privkey.pem
+       Include /etc/letsencrypt/options-ssl-apache.conf
+
+       <Directory /var/www/hobunror/arda/dist>
+           Options -Indexes +FollowSymLinks
+           AllowOverride None
+           Require all granted
+           DirectoryIndex index.html
+           RewriteEngine On
+           RewriteCond %{REQUEST_URI} !^/arda/api
+           RewriteCond %{REQUEST_FILENAME} !-f
+           RewriteRule ^/arda.* /arda/index.html [L]
+       </Directory>
+
+       ProxyPreserveHost On
+       ProxyPass /arda/api http://127.0.0.1:3000/api
+       ProxyPassReverse /arda/api http://127.0.0.1:3000/api
+
+       ErrorLog ${APACHE_LOG_DIR}/arda_error.log
+       CustomLog ${APACHE_LOG_DIR}/arda_access.log combined
+   </VirtualHost>
+   ```
+
+6. **Enable the Site and Restart Apache**
+   ```bash
+   sudo a2ensite arda.conf
+   sudo systemctl restart apache2
+   ```
+
+7. **Set Up the Backend Service**
+   Create the systemd service file `/etc/systemd/system/arda.service`:
+   ```ini
+   [Unit]
+   Description=Arda Tolkien Timeline Explorer
+   After=network.target
+
+   [Service]
+   Type=simple
+   User=www-data
+   WorkingDirectory=/var/www/hobunror/arda
+   ExecStart=/usr/bin/npm run server
+   Restart=on-failure
+   Environment=NODE_ENV=production
+
+   [Install]
+   WantedBy=multi-user.target
+   ```
+
+   Enable and start the service:
+   ```bash
+   sudo systemctl daemon-reload
+   sudo systemctl enable arda.service
+   sudo systemctl start arda.service
+   ```
+
+8. **Access the Application**
+   Navigate to:
+   ```
+   https://hobunror.nl/arda
+   ```
+
+---
+
+## Debugging
+
+### Common Issues
+
+#### 1. **Frontend API Calls Not Working**
+- **Error:** `Failed to fetch events: Cannot GET /api/events`
+- **Fix:**
+  - Ensure `VITE_API_BASE_URL` is set correctly in `.env` (`/api` for dev, `/arda/api` for prod).
+  - Verify API proxy settings in `vite.config.ts`.
+
+#### 2. **Backend API Not Responding**
+- **Error:** `Cannot GET /api/events`
+- **Fix:**
+  - Ensure the `/api/events` route is defined in `index.ts`.
+  - Verify the database (`events.db`) exists and contains data.
+
+#### 3. **Static Assets Not Loading**
+- **Error:** `Failed to load resource: vite.svg 404`
+- **Fix:**
+  - Ensure `base: '/arda/'` is set in `vite.config.ts`.
+  - Rebuild the frontend after updating the configuration.
+
+### Logs
+- **Apache Logs:**
+  ```bash
+  sudo tail -f /var/log/apache2/arda_error.log
+  sudo tail -f /var/log/apache2/arda_access.log
+  ```
+
+- **Backend Logs:**
+  ```bash
+  sudo journalctl -u arda.service -n 50
+  ```
+
+---
+
+## API Documentation
+
+### GET `/api/events`
+- **Description:** Fetch all events from the database.
+- **Response:**
+  ```json
+  [
+    {
+      "id": "1",
+      "title": "The Music of the Ainur",
+      "era": "Pre-First Age",
+      "year": "Before Arda's Shaping",
+      "characters": ["Eru Ilúvatar", "Ainur"],
+      "location": "Beyond/Outside Arda",
+      "summary": "Eru Ilúvatar instructs the Ainur to sing the Great Music, envisioning the universe of Eä.",
+      "relatedEventIds": [],
+      "source": ["The Silmarillion"]
+    }
+  ]
+  ```
+
+---
+
+## Environment Variables
+
+### Frontend
+- **`VITE_API_BASE_URL`**
+  - Base URL for API requests.
+  - Example: `/api` (dev), `/arda/api` (prod).
+
+### Backend
+- **`NODE_ENV`**
+  - Set to `production` for production deployment.
+
+---
+
